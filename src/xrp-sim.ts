@@ -120,6 +120,7 @@ export default class XRPSim {
     }
 
     public setHeading(hdg: number) {
+        console.log("Heading: ", hdg);
         this._xrpState.setHeading(hdg);
     }
 
@@ -133,6 +134,7 @@ export default class XRPSim {
 
     private _sendToWPILib() {
         if (this._remoteSocketInfo !== null) {
+            // console.log("sendToWPILib ", this._xrpState.getLeftEncoder(), this._xrpState.getRightEncoder());
             const header = Buffer.alloc(3);
             header.writeUInt16BE(this._outboundSeq, 0);
 

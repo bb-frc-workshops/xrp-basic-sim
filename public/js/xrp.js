@@ -2,6 +2,13 @@ const ROBOT_SIZE = 40; // 40px
 const ARENA_WIDTH = 800;
 const ARENA_HEIGHT = 500;
 
+// Robot is 10 physical inches, 
+// thus if we've moved 40px, we've moved 10 inches
+
+const INCH_PER_PIXEL = 0.5 / 40;
+const DISTANCE_PER_WHEEL_REV_IN = 2.3622 * Math.PI;
+const ENCODER_COUNT_PER_PIXEL = DISTANCE_PER_WHEEL_REV_IN * INCH_PER_PIXEL * 585;
+
 class Robot {
     constructor() {
         this._position = {
@@ -14,6 +21,9 @@ class Robot {
         this._leftSpeed = 0;
         this._rightSpeed = 0;
         this._bearing = 0;
+
+        this._leftEncoder = 0;
+        this._rightEncoder = 0;
     }
 
     get robotDivPosition() {
@@ -82,9 +92,22 @@ class Robot {
         this._rightSpeed = val;
     }
 
+    get leftEncoderValue() {
+        return this._leftEncoder;
+    }
+
+    get rightEncoderValue() {
+        return this._rightEncoder;
+    }
+
     resetPosition() {
+        this._leftEncoder = 0;
+        this._rightEncoder = 0;
+        this._leftSpeed = 0;
+        this._rightSpeed = 0;
         this.position = { x: ARENA_WIDTH / 2, y: ARENA_HEIGHT / 2};
         this.bearing = 0;
+        
     }
 
     update() {
@@ -97,6 +120,13 @@ class Robot {
 
     _processTick(timeDelta) {
         const timeInSec = timeDelta / 1000;
+
+        // The speed values are in "pixels per second"
+        const leftDelta = this._leftSpeed * timeInSec;
+        const rightDelta = this._rightSpeed * timeInSec;
+
+        this._leftEncoder += leftDelta * ENCODER_COUNT_PER_PIXEL;
+        this._rightEncoder += rightDelta * ENCODER_COUNT_PER_PIXEL;
 
         const newPos = _calculateNewPosition(this._position, this._bearing, 
                             this._leftSpeed, this._rightSpeed, timeInSec);
@@ -198,5 +228,18 @@ setInterval(() => {
 
     _lastTime = currTime;
 }, 10);
+
+setInterval(() => {
+    if (shouldSendSensorData) {
+        ws.send(JSON.stringify({
+            type: "SensorData",
+            payload: {
+                heading: robot.bearing,
+                leftEncoder: robot.leftEncoderValue,
+                rightEncoder: robot.rightEncoderValue
+            }
+        }))
+    }
+}, 50);
 
 };

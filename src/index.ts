@@ -73,6 +73,19 @@ wsServer.on("connection", (ws, request) => {
 
     ws.on("message", (data) => {
         // Sensor data TODO
+        try {
+            const messageJson = JSON.parse(data.toString());
+
+            if (messageJson.type === "SensorData") {
+                const payload = messageJson.payload;
+                xrp.setHeading(payload.heading);
+                xrp.setLeftEncoderValue(payload.leftEncoder);
+                xrp.setRightEncoderValue(payload.rightEncoder);
+                
+            }
+        } catch (err) {
+
+        }
     });
 });
 

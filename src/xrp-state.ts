@@ -12,8 +12,16 @@ export default class XRPState {
         this._encoderInputs.set(0, val);
     }
 
+    public getLeftEncoder(): number {
+        return this._encoderInputs.get(0) || 0;
+    }
+
     public setRightEncoder(val: number) {
         this._encoderInputs.set(1, val);
+    }
+
+    public getRightEncoder(): number {
+        return this._encoderInputs.get(1) || 0;
     }
 
     public setHeading(val: number) {
