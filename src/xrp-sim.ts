@@ -120,7 +120,6 @@ export default class XRPSim {
     }
 
     public setHeading(hdg: number) {
-        console.log("Heading: ", hdg);
         this._xrpState.setHeading(hdg);
     }
 
